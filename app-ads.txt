@@ -90,7 +90,7 @@ trustedstack.com, TSCLS3659, RESELLER
 xandr.com, 13799, RESELLER
 sharethrough.com, 6qlnf8SY, RESELLER, d53b998a7bd4ecd2
 triplelift.com, 12158, RESELLER, 6c33edb13117fd86
-google.com, pub-3990748024667386, RESELLER, f08c47fec0942fa0
+google.com, pub-3990748024667386, DIRECT, f08c47fec0942fa0
 Xapads.com, 117219, RESELLER
 Pubmatic.com, 162882, RESELLER, 5d62403b186f2ace
 Pubmatic.com, 163319, RESELLER, 5d62403b186f2ace
