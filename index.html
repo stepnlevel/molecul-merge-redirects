@@ -7,24 +7,59 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DM82T7W6EC"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
+  function gtag(){ dataLayer.push(arguments); }
   gtag('js', new Date());
   gtag('config', 'G-DM82T7W6EC');
 </script>
 
 <script>
-  var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  // ---- Определение устройств ----
 
-  if (/android/i.test(userAgent)) {
-      gtag('event', 'redirect_to_android');
-      window.location.href = "https://play.google.com/store/apps/details?id=com.StepNlevel.MoleculMerge";
-  } else if (/iPad|iPhone|iPod/.test(userAgent)) {
-      gtag('event', 'redirect_to_ios');
-      window.location.href = "https://apps.apple.com/app/id6753990749";
-  } else {
-      gtag('event', 'redirect_desktop');
-      window.location.href = "https://t.me/chto_za_igra";
+  function isAndroid() {
+    return /android/i.test(navigator.userAgent);
   }
+
+  function isIOS() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+
+    // iPhone / iPod
+    if (/iPhone|iPod/.test(ua)) return true;
+
+    // iPad (старые модели)
+    if (/iPad/.test(ua)) return true;
+
+    // iPadOS 13+ (Safari маскируется под macOS)
+    if (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+      return true;
+
+    return false;
+  }
+
+  // ---- Ссылки ----
+
+  const androidUrl = "https://play.google.com/store/apps/details?id=com.StepNlevel.MoleculMerge";
+  const iosUrl = "https://apps.apple.com/app/id6753990749";
+  const desktopUrl = "https://t.me/chto_za_igra";
+
+  // ---- Логика ----
+
+  function doRedirect() {
+    if (isAndroid()) {
+      gtag('event', 'redirect_android');
+      setTimeout(() => window.location.href = androidUrl, 300);
+    } 
+    else if (isIOS()) {
+      gtag('event', 'redirect_ios');
+      setTimeout(() => window.location.href = iosUrl, 300);
+    } 
+    else {
+      gtag('event', 'redirect_desktop');
+      setTimeout(() => window.location.href = desktopUrl, 300);
+    }
+  }
+
+  // Делаем редирект после загрузки
+  window.onload = doRedirect;
 </script>
 </head>
 <body>
