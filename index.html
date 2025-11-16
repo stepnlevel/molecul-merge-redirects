@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 
-<!-- Google Analytics -->
+<!-- ======== Google Analytics ======== -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DM82T7W6EC"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -13,56 +13,95 @@
 </script>
 
 <script>
-  // ---- Определение устройств ----
+/* ==========================
+      UTM + DEVICE + GEO PRO TRACKER
+   ========================== */
 
-  function isAndroid() {
-    return /android/i.test(navigator.userAgent);
+function getQueryParams() {
+  const params = {};
+  const queryString = window.location.search.substring(1).split("&");
+  queryString.forEach(pair => {
+    const [key, value] = pair.split("=");
+    if (key) params[key] = decodeURIComponent(value || "");
+  });
+  return params;
+}
+
+function detectDevice() {
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  if (/android/i.test(ua)) return "android";
+  if (/iPad|iPhone|iPod/.test(ua)) return "ios";
+  return "desktop";
+}
+
+// country detection using browser locale
+function detectCountry() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().locale.split("-")[1] || "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+// send event safely
+function sendEvent(name, params = {}) {
+  gtag('event', name, params);
+}
+
+function performRedirect(device) {
+  let target = "";
+
+  if (device === "android") {
+    target = "https://play.google.com/store/apps/details?id=com.StepNlevel.MoleculMerge";
+    sendEvent("redirect_to_android");
+  } else if (device === "ios") {
+    target = "https://apps.apple.com/app/id6753990749";
+    sendEvent("redirect_to_ios");
+  } else {
+    target = "https://t.me/chto_za_igra";
+    sendEvent("redirect_desktop");
   }
 
-  function isIOS() {
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
+  // Safe delay so GA4 sends all events
+  setTimeout(() => { window.location.href = target; }, 350);
+}
 
-    // iPhone / iPod
-    if (/iPhone|iPod/.test(ua)) return true;
+window.onload = function() {
+  const utm = getQueryParams();
+  const device = detectDevice();
+  const country = detectCountry();
+  const language = navigator.language || "unknown";
+  const referrer = document.referrer || "none";
 
-    // iPad (старые модели)
-    if (/iPad/.test(ua)) return true;
+  // 1) Send UTM event
+  sendEvent("utm_detected", utm);
 
-    // iPadOS 13+ (Safari маскируется под macOS)
-    if (navigator.userAgent.includes("Mac") && "ontouchend" in document)
-      return true;
+  // 2) General landing event with all parameters
+  sendEvent("landing_page_opened", {
+    device: device,
+    country: country,
+    language: language,
+    referrer: referrer,
+    full_url: window.location.href,
+    utm_source: utm.utm_source || "none",
+    utm_medium: utm.utm_medium || "none",
+    utm_campaign: utm.utm_campaign || "none"
+  });
 
-    return false;
-  }
+  // 3) Device event
+  sendEvent("device_type", { device: device });
 
-  // ---- Ссылки ----
+  // 4) Country event
+  sendEvent("country_detected", { country: country });
 
-  const androidUrl = "https://play.google.com/store/apps/details?id=com.StepNlevel.MoleculMerge";
-  const iosUrl = "https://apps.apple.com/app/id6753990749";
-  const desktopUrl = "https://t.me/chto_za_igra";
-
-  // ---- Логика ----
-
-  function doRedirect() {
-    if (isAndroid()) {
-      gtag('event', 'redirect_android');
-      setTimeout(() => window.location.href = androidUrl, 300);
-    } 
-    else if (isIOS()) {
-      gtag('event', 'redirect_ios');
-      setTimeout(() => window.location.href = iosUrl, 300);
-    } 
-    else {
-      gtag('event', 'redirect_desktop');
-      setTimeout(() => window.location.href = desktopUrl, 300);
-    }
-  }
-
-  // Делаем редирект после загрузки
-  window.onload = doRedirect;
+  // 5) Redirect user
+  performRedirect(device);
+};
 </script>
+
 </head>
 <body>
 Redirecting...
 </body>
 </html>
+
