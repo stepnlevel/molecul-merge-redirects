@@ -28,8 +28,23 @@ function getQueryParams() {
 
 function detectDevice() {
   const ua = navigator.userAgent || navigator.vendor || window.opera;
+  
+  // Android detection
   if (/android/i.test(ua)) return "android";
-  if (/iPad|iPhone|iPod/.test(ua)) return "ios";
+  
+  // iOS detection (iPhone, iPod, старые iPad)
+  if (/iPhone|iPod/.test(ua)) return "ios";
+  if (/iPad/.test(ua)) return "ios";
+  
+  // Новые iPad (iPadOS 13+) - несколько способов проверки
+  const isMacOS = /Macintosh|MacIntel|MacPPC|Mac68K/i.test(ua);
+  const hasTouch = navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+  
+  // Дополнительная проверка: iPad имеет определенное соотношение сторон
+  const isTabletScreen = window.screen.width >= 768 && window.screen.width <= 1024;
+  
+  if (isMacOS && (hasTouch || isTabletScreen)) return "ios";
+  
   return "desktop";
 }
 
